@@ -21,12 +21,22 @@ export const createPost = (post) => async (dispatch) => {
   }
 };
 
-// export const updatePost = () => async (dispatch) => {
-//   try {
-//     const { data } = await api.createPost(post);
+export const updatePost = (id, post) => async (dispatch) => {
+  try {
+    const { data } = await api.updatePost(id, post);
 
-//     dispatch({ type: postActionTypes.CREATE, payload: data });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+    dispatch({ type: postActionTypes.UPDATE, payload: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deletePost = (id) => async (dispatch) => {
+  try {
+    await api.deletePost(id);
+
+    dispatch({ type: postActionTypes.DELETE, payload: id });
+  } catch (error) {
+    console.log(error);
+  }
+};

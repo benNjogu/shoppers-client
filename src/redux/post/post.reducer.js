@@ -4,12 +4,18 @@ const INITIAL_STATE = {
   posts: [],
 };
 
-const postReducer = (state = INITIAL_STATE, action) => {
+const postReducer = (state = [], action) => {
   switch (action.type) {
     case postActionTypes.FETCH_ALL:
       return action.payload;
     case postActionTypes.CREATE:
-      return [...INITIAL_STATE.posts, action.payload];
+      return [...state, action.payload];
+    case postActionTypes.UPDATE:
+      return state.map((post) =>
+        post._id === action.payload._id ? action.payload : post
+      );
+    case postActionTypes.DELETE:
+      return state.filter((post) => post._id !== action.payload);
     default:
       return state;
   }

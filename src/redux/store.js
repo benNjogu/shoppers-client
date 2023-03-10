@@ -4,6 +4,11 @@ import thunk from "redux-thunk";
 
 import rootReducer from "./root-reducer";
 
-const store = createStore(rootReducer, compose(applyMiddleware(thunk)));
+const middleWares = [logger];
+
+const store = createStore(
+  rootReducer,
+  compose(applyMiddleware(thunk, ...middleWares))
+);
 
 export default store;

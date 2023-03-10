@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { TextField, Button, Typography, Paper } from "@material-ui/core";
+import React, { useState, useEffect } from "react";
+import { TextField, Typography, Paper, Checkbox } from "@material-ui/core";
 import FileBase from "react-file-base64";
 
-import { useDispatch } from "react-redux";
-import { createPost } from "../../redux/post/post.action";
+import { useDispatch, useSelector } from "react-redux";
+import { createPost, updatePost } from "../../redux/post/post.action";
 
 import useStyles from "./form.styles";
+import CustomButton from "../custom-button/custom-button.component";
 
 const defaultValues = {
   name: "",
@@ -13,22 +14,55 @@ const defaultValues = {
   price: "",
   discount: "",
   newPrice: "",
-  sponsored: "",
+  sponsored: Boolean,
   rating: "",
   images: "",
 };
 
-const Form = () => {
+const Form = ({ currentId, setCurrentId }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [postData, setPostData] = useState(defaultValues);
+  const [checked, setChecked] = useState(false);
+  const post = useSelector(
+    (state) => currentId && state.posts.find((post) => post._id === currentId)
+  );
+
+  useEffect(() => {
+    if (post) setPostData(post);
+  }, [post]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(createPost(postData));
+
+    if (currentId) {
+      if (postData.discount !== 0 || postData.discount !== "")
+        calculateDiscount();
+      dispatch(updatePost(currentId, postData));
+    } else {
+      if (postData.discount !== 0 || postData.discount !== "")
+        calculateDiscount();
+      dispatch(createPost(postData));
+    }
+
+    handleClear();
   };
 
-  const clear = () => {};
+  const handleClear = () => {
+    setCurrentId(null);
+    setChecked(false);
+    setPostData(defaultValues);
+  };
+
+  const handleCheck = (e) => {
+    setChecked(!checked);
+    console.log(checked);
+    setPostData({ ...postData, sponsored: checked });
+  };
+
+  const calculateDiscount = () => {
+    postData.newPrice = ((100 - postData.discount) / 100) * postData.price;
+  };
 
   return (
     <Paper className={classes.paper}>
@@ -38,9 +72,11 @@ const Form = () => {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6">Add Item</Typography>
+        <Typography variant="h6">
+          {`${currentId ? "Edit" : "Add"} Item`}
+        </Typography>
         <TextField
-          name="creator"
+          name="name"
           variant="outlined"
           label="Name"
           fullWidth
@@ -48,7 +84,7 @@ const Form = () => {
           onChange={(e) => setPostData({ ...postData, name: e.target.value })}
         />
         <TextField
-          name="creator"
+          name="description"
           variant="outlined"
           label="Description"
           fullWidth
@@ -58,47 +94,40 @@ const Form = () => {
           onChange={(e) => setPostData({ ...postData, desc: e.target.value })}
         />
         <TextField
-          name="creator"
+          name="original"
           variant="outlined"
-          label="Price"
+          label="Original Price"
           fullWidth
+          required
           value={postData.price}
           onChange={(e) => setPostData({ ...postData, price: e.target.value })}
         />
         <TextField
-          name="creator"
+          name="discount"
           variant="outlined"
-          label="Discount"
+          label="Percent Discount(e.g. 10)"
           fullWidth
           value={postData.discount}
           onChange={(e) =>
             setPostData({ ...postData, discount: e.target.value })
           }
         />
+        <div className={classes.sponsoredContainer}>
+          <Typography variant="h6" className={classes.sponsoredText}>
+            Sponsored
+          </Typography>
+          <Checkbox
+            color="primary"
+            defaultChecked={false}
+            checked={postData.sponsored}
+            onChange={handleCheck}
+          />
+        </div>
+
         <TextField
-          name="creator"
+          name="rating"
           variant="outlined"
-          label="New Price"
-          fullWidth
-          value={postData.newPrice}
-          onChange={(e) =>
-            setPostData({ ...postData, newPrice: e.target.value })
-          }
-        />
-        <TextField
-          name="creator"
-          variant="outlined"
-          label="Sponsored"
-          fullWidth
-          value={postData.sponsored}
-          onChange={(e) =>
-            setPostData({ ...postData, sponsored: e.target.value })
-          }
-        />
-        <TextField
-          name="creator"
-          variant="outlined"
-          label="Rating"
+          label="Rating(1 to 5)"
           fullWidth
           value={postData.rating}
           onChange={(e) => setPostData({ ...postData, rating: e.target.value })}
@@ -112,17 +141,21 @@ const Form = () => {
             }}
           />
         </div>
-
-        <Button
-          className={classes.buttonSubmit}
-          variant="contained"
-          color="primary"
-          size="large"
-          type="submit"
-          fullWidth
-        >
-          Submit
-        </Button>
+        <div className={classes.buttons}>
+          <CustomButton
+            text="Clear"
+            color="secondary"
+            size={"large"}
+            onClick={handleClear}
+          />
+          <CustomButton
+            text="Add"
+            color="primary"
+            size={"large"}
+            type="submit"
+            onClick={handleSubmit}
+          />
+        </div>
       </form>
     </Paper>
   );

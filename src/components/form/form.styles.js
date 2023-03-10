@@ -18,7 +18,20 @@ export default makeStyles((theme) => ({
     width: "97%",
     margin: "10px 0",
   },
-  buttonSubmit: {
-    marginBottom: 10,
+  buttons: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  sponsoredContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  sponsoredText: {
+    marginLeft: "16px",
+    fontWeight: "bold",
   },
 }));
