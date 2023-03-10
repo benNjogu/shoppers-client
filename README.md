@@ -1,5 +1,9 @@
 download the server from here https://github.com/benNjogu/shoppers-server
+
+
 run the server using npm start
+
+
 run the client using npm start
 
 
